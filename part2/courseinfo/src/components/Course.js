@@ -21,9 +21,10 @@ return(
 }
 
 const Total = (props) => {
-return(
-    <p>Number of exercises {props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises}</p>
-)}
+    return(
+        <p>Number of exercises {props.parts.reduce((acc, part) => { return acc + part.exercises;}, 0)} </p>
+    )
+}
 
 const Course = ({course}) => {
     return (
@@ -32,6 +33,7 @@ const Course = ({course}) => {
             {course.parts.map(part => 
                 <Part key={part.id} part={part}/>
                 )}
+            <Total parts={course.parts}></Total>
         </>
     )
 }
