@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {useState, useEffect} from 'react'
+import Country from './components/Country'
 
 const App = () => {
   const [countries, setCountries] = useState([])
@@ -31,8 +32,6 @@ const App = () => {
     })
   }, [])
 
-  console.log(selectedCountry.flags.png)
-
   if(countries.filter(element => element.name.common.toLowerCase().includes(filter.toLowerCase())).length > 10){
     return(
       <div>
@@ -50,7 +49,7 @@ const App = () => {
         area {selectedCountry.area}
         <h3>languages:</h3>
         {Object.values(selectedCountry.languages).map(item => {
-          return(<div>{item}</div>)
+          return(<div key={item}>{item}</div>)
         })}
         <img src={selectedCountry.flags.png}></img> 
       </div>
@@ -60,7 +59,7 @@ const App = () => {
     <div>
       Find country: <input onChange={handleFilterChange}/>
       {countries.map(element => {
-        return element.name.common.toLowerCase().includes(filter.toLowerCase()) ? <div key={element.name.common}>{element.name.common}</div> : null 
+        return element.name.common.toLowerCase().includes(filter.toLowerCase()) ? <Country selectedCountry={element} key={element.name.common} /> : null 
       })}
     </div>
   )
