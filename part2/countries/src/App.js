@@ -16,7 +16,7 @@ const App = () => {
       setSelectedCountry(countries.find(element => element.name.common.toLowerCase().includes(filter.toLowerCase())))
       console.log("Found country")
     }
-  }, [filter])
+  }, [filter, countries])
 
   useEffect(() => {
     console.log(selectedCountry)
@@ -44,14 +44,7 @@ const App = () => {
     return(
       <div>
         Find country: <input onChange={handleFilterChange}/>
-        <h1>{selectedCountry.name.common}</h1>
-        {selectedCountry.capital} <br />
-        area {selectedCountry.area}
-        <h3>languages:</h3>
-        {Object.values(selectedCountry.languages).map(item => {
-          return(<div key={item}>{item}</div>)
-        })}
-        <img src={selectedCountry.flags.png}></img> 
+        <Country showCountry={true} selectedCountry={selectedCountry} key={selectedCountry.name.common} />
       </div>
     )
   }
@@ -59,7 +52,7 @@ const App = () => {
     <div>
       Find country: <input onChange={handleFilterChange}/>
       {countries.map(element => {
-        return element.name.common.toLowerCase().includes(filter.toLowerCase()) ? <Country selectedCountry={element} key={element.name.common} /> : null 
+        return element.name.common.toLowerCase().includes(filter.toLowerCase()) ? <Country showCountry={false} selectedCountry={element} key={element.name.common} /> : null 
       })}
     </div>
   )
