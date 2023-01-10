@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -28,7 +29,21 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    persons.some(element => element.name === personObject.name) ? alert(`${personObject.name} already exists`) : setPersons(persons.concat(personObject))
+    /* persons.some(element => element.name === personObject.name) ? alert(`${personObject.name} already exists`) : setPersons(persons.concat(personObject))
+ */
+    if(persons.some(element => element.name === personObject.name)){
+      alert(`${personObject.name} already exists`)
+    } else {
+      personService
+        .create(personObject)
+        .then((response) => {
+          console.log(response.data)
+          setPersons(persons.concat(response.data))
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
     setNewName('')
     setNewNumber('')
   }
