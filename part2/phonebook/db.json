@@ -34,21 +34,6 @@
       "name": "Jaana Jaanala",
       "number": "23-456789",
       "id": 7
-    },
-    {
-      "name": "Ossi Onninen",
-      "number": "45-678901",
-      "id": 8
-    },
-    {
-      "name": "Toni Tonninen",
-      "number": "90-123456",
-      "id": 9
-    },
-    {
-      "name": "Tanja Tamminen",
-      "number": "99-112453",
-      "id": 10
     }
   ]
 }
