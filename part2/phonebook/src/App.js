@@ -3,12 +3,15 @@ import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -49,8 +52,11 @@ const App = () => {
         personService
           .update(person.id, personObject)
           .then((response) => {
-            console.log(response)
             setPersons(persons.map(person => person.id !== response.id ? person : response))
+            setSuccessMessage(`Updated ${personObject.name}`)
+            setTimeout(() => {          
+              setSuccessMessage(null)        
+            }, 5000)
           })
           .catch((error) => {
             console.log(error)
@@ -60,8 +66,11 @@ const App = () => {
       personService
         .create(personObject)
         .then((response) => {
-          console.log(response)
           setPersons(persons.concat(response))
+          setSuccessMessage(`Added ${personObject.name}`)
+          setTimeout(() => {          
+            setSuccessMessage(null)        
+          }, 5000)
         })
         .catch((error) => {
           console.log(error)
@@ -86,7 +95,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-        <Filter handleFilterChange={handleFilterChange}/>
+      <Notification type="success" message={successMessage} />
+      <Filter handleFilterChange={handleFilterChange}/>
       <h2>Add new</h2>
         <PersonForm newNumber={newNumber} handleNumberChange={handleNumberChange}
           newName={newName} handleNameChange={handleNameChange} addPerson={addPerson}/>
