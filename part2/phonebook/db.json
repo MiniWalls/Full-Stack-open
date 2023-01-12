@@ -24,21 +24,6 @@
       "name": "Matti Mattinen",
       "number": "01-234567",
       "id": 5
-    },
-    {
-      "name": "Teppo Tepponen",
-      "number": "12-345678",
-      "id": 6
-    },
-    {
-      "name": "Jaana Jaanala",
-      "number": "23-456789",
-      "id": 7
-    },
-    {
-      "name": "Matti Moilanen",
-      "number": "12-345678",
-      "id": 8
     }
   ]
 }

@@ -11,7 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [successMessage, setSuccessMessage] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -36,6 +36,10 @@ const App = () => {
         })
         .catch((error) => {
           console.log(error)
+          setErrorMessage(`Information of ${person.name} has already been removed from server`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
         })
     }
   }
@@ -96,6 +100,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification type="success" message={successMessage} />
+      <Notification type="error" message={errorMessage} />
       <Filter handleFilterChange={handleFilterChange}/>
       <h2>Add new</h2>
         <PersonForm newNumber={newNumber} handleNumberChange={handleNumberChange}
