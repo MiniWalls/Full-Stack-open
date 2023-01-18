@@ -56,9 +56,17 @@ app.post('/api/persons', (request, response) => {
   const person = request.body
   console.log(request.body)
   person.id = id
-  addresses = addresses.concat(person)
+  console.log(person.name, person.number)
+  if(person.name === "" || person.number === ""){
+    response.status(400).json({error: 'name or number is missing'}).end()
+  } else if (addresses.some(element => element.name === person.name)){
+    response.status(400).json({error: 'name must be unique'}).end()
+  } else {
+    addresses = addresses.concat(person)
+    response.json(person)
+  }
 
-  response.json(person)
+
 })
 
 app.get('/info', (request, response) => {
