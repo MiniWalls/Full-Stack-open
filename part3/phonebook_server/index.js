@@ -7,6 +7,7 @@ function isPostRequest(req) {
   return req.method === 'POST'
 }
 
+app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 app.use(morgan('tiny', {
