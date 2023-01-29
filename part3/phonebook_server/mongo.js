@@ -18,6 +18,14 @@ const phonebookSchema = new mongoose.Schema({
   number: String,
 })
 
+phonebookSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString()
+      delete returnedObject._id
+      delete returnedObject.__v
+    }
+})
+
 const Person = mongoose.model('Phonebook', phonebookSchema)
 
 const person = new Person({
@@ -31,6 +39,7 @@ if(process.argv.length<5){
         console.log(`phonebook:`)
         result.forEach(person => {
             console.log(`${person.name} ${person.number}`)
+            console.log(person.toJSON())
         })
         mongoose.connection.close()
     })
