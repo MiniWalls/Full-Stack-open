@@ -22,23 +22,47 @@ app.get('/api/persons', (request, response) => {
   })  
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  Address.findById(request.params.id).then(address => {
-    response.json(address)
-  })
+app.get('/api/persons/:id', (request, response, next) => {
+  Address.findById(request.params.id)
+    .then(address => {
+      if (address) {
+        response.json(address)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  console.log(id)
-  addresses = addresses.filter(address => address.id !== id)
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
 
-  response.status(204).end()
+  const address = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Address.findByIdAndUpdate(request.params.id, address, { new:true })
+    .then(updatedAddress => {
+      response.json(updatedAddress)
+    })
+    .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Address.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
   const date = new Date();
-  response.send(`<p>Phone book has info for ${addresses.length} people </br> ${date} </p>`)  
+  Address.find({}).then(addresses => {
+    response.send(`<p>Phone book has info for ${addresses.length} people </br> ${date} </p>`)  
+  })  
+
 })
 
 morgan.token('response-body', (req, res) => {return JSON.stringify(req.body)});
@@ -60,6 +84,18 @@ app.post('/api/persons', (request, response) => {
     })
   }
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3002
 app.listen(PORT, () => { 
