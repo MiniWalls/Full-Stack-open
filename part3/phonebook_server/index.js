@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors');
-const Address = require('./models/address')
+const Address = require('./models/address');
+const address = require("./models/address");
 const app = express()
 
 function isPostRequest(req) {
@@ -42,7 +43,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Address.findByIdAndUpdate(request.params.id, address, { new:true })
+  Address.findByIdAndUpdate(request.params.id, address)
     .then(updatedAddress => {
       response.json(updatedAddress)
     })
@@ -68,21 +69,19 @@ app.get('/info', (request, response) => {
 morgan.token('response-body', (req, res) => {return JSON.stringify(req.body)});
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :response-body')) //include newly defined ':response-body' token
 
-app.post('/api/persons', (request, response) => {
-  const person = request.body
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body
 
-  if(!person.name || !person.number) {
-    return response.status(400).json({error: 'name or number is missing'}).end()
-  } else {
-    const address = new Address({
-      name: person.name,
-      number: person.number
-    })
+  const address = new Address ({
+    name: body.name,
+    number: body.number,
+  })
 
-    address.save().then(savedAddress => {
-      response.json(savedAddress)
-    })
-  }
+  address.save()
+  .then(savedAddress => {
+    response.json(savedAddress)
+  })
+  .catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
@@ -90,6 +89,10 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({error: error.message})
+  } else if (error.name === 'MongoServerError') {
+    return response.status(400).json({error: error.message})
   }
 
   next(error)

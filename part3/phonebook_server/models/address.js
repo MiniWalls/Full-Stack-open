@@ -15,8 +15,22 @@ mongoose.connect(url)
     })
 
 const addressSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minlength: 3,
+    required: true,
+    unique: true
+  },
+  number: {
+    type: String,
+    minlength: 8,
+    required: true,
+    validate: {
+        validator: function(v) {
+            return /^\d{2,3}?[-]?\d{5,}/.test(v);
+        }
+    }
+  },
 })
 
 addressSchema.set('toJSON', {
@@ -25,6 +39,12 @@ addressSchema.set('toJSON', {
       delete returnedObject._id
       delete returnedObject.__v
     }
+})
+
+addressSchema.pre('findOneAndUpdate', function(next) {
+    this.options.runValidators = true;
+    this.options.new = true;
+    next();
 })
 
 module.exports = mongoose.model('Address', addressSchema)
