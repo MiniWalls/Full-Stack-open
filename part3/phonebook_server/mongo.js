@@ -19,33 +19,33 @@ const phonebookSchema = new mongoose.Schema({
 })
 
 phonebookSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-      returnedObject.id = returnedObject._id.toString()
-      delete returnedObject._id
-      delete returnedObject.__v
-    }
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
 })
 
 const Person = mongoose.model('Phonebook', phonebookSchema)
 
 const person = new Person({
-    name: process.argv[3],
-    number: process.argv[4],
+  name: process.argv[3],
+  number: process.argv[4],
 })
 
 
 if(process.argv.length<5){
-    Person.find({}).then(result => {
-        console.log(`phonebook:`)
-        result.forEach(person => {
-            console.log(`${person.name} ${person.number}`)
-            console.log(person.toJSON())
-        })
-        mongoose.connection.close()
+  Person.find({}).then(result => {
+    console.log('phonebook:')
+    result.forEach(person => {
+      console.log(`${person.name} ${person.number}`)
+      console.log(person.toJSON())
     })
+    mongoose.connection.close()
+  })
 } else {
-    person.save().then(result => {
-        console.log(`added ${result.name} number ${result.number} to phonebook`)
-        mongoose.connection.close()
-      })
+  person.save().then(result => {
+    console.log(`added ${result.name} number ${result.number} to phonebook`)
+    mongoose.connection.close()
+  })
 }
