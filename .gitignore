@@ -1,4 +1,4 @@
 node_modules
 .env
 build
-part3/phonebook_server/serverAppEngine.yaml
+serverAppEngine.yaml
