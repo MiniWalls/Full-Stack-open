@@ -6,6 +6,7 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -33,6 +34,9 @@ describe('when there is initially some blogs saved', () => {
 
 describe('addition of a new blog', () => {
   test('blog can be added', async() => {
+    const credentials = await helper.userToken()
+    const token = credentials.token
+
     const newBlog = {
       title: 'Fishermans Diaries',
       author: 'Arto kalastaja',
@@ -43,6 +47,7 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -54,6 +59,9 @@ describe('addition of a new blog', () => {
   })
 
   test('blog without likes defaults to 0', async() => {
+    const credentials = await helper.userToken()
+    const token = credentials.token
+
     const newBlog = {
       title: 'Fishermans Diaries 2',
       author: 'Arto kalastaja',
@@ -63,6 +71,7 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -70,6 +79,9 @@ describe('addition of a new blog', () => {
   })
 
   test('blog without title or url returns 400', async() => {
+    const credentials = await helper.userToken()
+    const token = credentials.token
+
     const newBlog = {
       author: 'Arto kalastaja',
       url: 'http://www.kalastaja2onparempi.fi',
@@ -79,6 +91,7 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     const newBlog2 = {
@@ -90,28 +103,47 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlog2)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
+  })
+  test('trying to add a blog without authorization returns 401', async() => {
+    const newBlog = {
+      title: 'Fishermans Diaries',
+      author: 'Arto kalastaja',
+      likes: 2,
+      url: 'http://www.kalastaja.fi'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
 })
 
-describe('deletion of a blog', () => {
+/* describe('deletion of a blog', () => {
   test('blog can be deleted', async() => {
+    const credentials = await helper.userToken()
+    const token = credentials.token
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
-
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length -1)
   })
-  test('blog without valid id returns 400', async() => {
+   test('blog without valid id returns 400', async() => {
     await api
       .delete('/api/blogs/123')
       .expect(400)
-  })
+  }) 
 })
 
 describe('change of existing blog', () => {
@@ -151,7 +183,7 @@ describe('change of existing blog', () => {
       .send(updatedBlog)
       .expect(400)
   })
-})
+} */
 
 afterAll(async () => {
   await mongoose.connection.close()

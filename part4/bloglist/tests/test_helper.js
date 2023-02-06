@@ -1,4 +1,7 @@
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const initialBlogs = [
   {
@@ -21,11 +24,59 @@ const initialBlogs = [
   }
 ]
 
+const initialUsers = [
+  {
+    'username': 'root',
+    'name': 'Superuser',
+    'passwordHash': 'sekret'
+  },
+  {
+    'username': 'Tapsa',
+    'name': 'Tapani Tavoittelija',
+    'passwordHash': 'qwerty'
+  },
+]
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
+const usersInDb = async () => {
+  const user = await User.find({})
+  return user.map(u => u.toJSON())
+}
+
+const userToken = async () => {
+  const userCredentials = {
+    username: initialUsers[0].username,
+    password: initialUsers[0].passwordHash
+  }
+
+  const user = await User.findOne({ username: userCredentials.username })
+
+  const passwordCorrect = user === null
+    ? false
+    : await bcrypt.compare(userCredentials.password, user.passwordHash)
+
+  if (!(user && passwordCorrect)) {
+    return { 'token': 'invalid username or password' }
+  }
+
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  }
+  const token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 600 * 600 }
+  )
+  return({ token, username: user.username, name: user.name })
+}
+
 module.exports = {
-  initialBlogs, blogsInDb
+  initialBlogs, blogsInDb,
+  initialUsers, usersInDb,
+  userToken
 }
